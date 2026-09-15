@@ -237,8 +237,33 @@
     color: #fff !important; /* Ensures text stays readable when grayed out */
 }
     
+   @media (max-width: 600px) {
+    .container {
+        padding: 20px;
+        margin: 15px;
+        width: 90%;
+    }
+    .header-logo {
+        font-size: 24px;
+    }
+    h2 {
+        font-size: 20px;
+    }
+    button {
+        font-size: 16px;
+    }
+} 
+    #processing {
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+}
+#processing.show {
+    opacity: 1;
+}
     
-    </style>
+    
+ </style>
+
 
     
 </head>
