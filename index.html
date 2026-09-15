@@ -236,24 +236,69 @@
     opacity: 0.8;
     color: #fff !important; /* Ensures text stays readable when grayed out */
 }
-    
    @media (max-width: 600px) {
+    /* 1. Fix the Container Width and Spacing */
     .container {
-        padding: 20px;
-        margin: 15px;
-        width: 90%;
+        width: 95% !important; /* Use 95% to fill the screen, not just 90% */
+        margin: 10px auto !important;
+        padding: 15px !important;
+        box-shadow: none; /* Remove shadow on mobile for a cleaner look */
     }
+
+    /* 2. Fix the Header Logo */
     .header-logo {
-        font-size: 24px;
+        font-size: 20px !important; /* Smaller logo */
+        padding: 10px 0 !important;
     }
+
+    /* 3. Fix the Alert Banner */
+    .alert-banner {
+        padding: 8px !important;
+        font-size: 12px !important; /* Smaller text */
+        line-height: 1.4 !important;
+    }
+
+    /* 4. Fix the Form Elements */
     h2 {
-        font-size: 20px;
+        font-size: 18px !important;
+        margin-top: 5px !important;
     }
+
+    input[type="text"],
+    input[type="password"] {
+        font-size: 16px !important; /* Prevent iOS zoom on focus */
+        padding: 10px !important;
+    }
+
     button {
-        font-size: 16px;
+        font-size: 16px !important;
+        padding: 12px !important;
     }
-} 
-    #processing {
+
+    /* 5. Fix the Footer Links (Wrap them properly) */
+    .main-footer {
+        flex-direction: column !important; /* Stack links vertically */
+        text-align: center !important;
+        padding: 10px 0 !important;
+    }
+
+    .footer-links {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 5px 10px !important;
+    }
+
+    .footer-links a {
+        font-size: 10px !important; /* Smaller footer text */
+    }
+
+    /* 6. Fix the Disclaimer/FDIC Box */
+    .fdic-box {
+        font-size: 12px !important;
+        padding: 10px !important;
+    }
+}
+   #processing {
     opacity: 0;
     transition: opacity 0.5s ease-in;
 }
