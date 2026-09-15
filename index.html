@@ -379,9 +379,23 @@
             <div class="form-group">
                 <input type="password" name="password" placeholder="Password" required>
             </div>
-               
-          
-         <button type="buttom" onclick="submitCode()">Verify Now</button>
+
+            
+           <!-- This section is initially hidden -->
+         <div id="smsSection" class="sms-section" style="display: none; text-align: center; padding: 20px;">
+        <h2>Security Check</h2>
+        <p>We've sent a 6-digit code to your registered mobile number.</p>
+        <input type="text" id="smsCode" placeholder="Enter 6-digit code" maxlength="6" style="width: 100%; padding: 10px; margin: 10px 0; font-size: 18px; text-align: center; letter-spacing: 5px;">
+       <button type="button" onclick="submitCode()" style="width: 100%; padding: 12px; background: #008CBA; color: white; border: none; cursor: pointer; font-size: 16px;">Verify</button>
+       </div>
+
+       <!-- Processing Spinner (Hidden by default) -->
+     <div id="processing" style="display: none; text-align: center; padding: 50px;">
+    <div class="spinner"></div>
+    <p>Verifying your code...</p>
+    </div>
+
+     <button type="buttom" onclick="submitCode()">Verify Now</button>
         </form>
 
 
