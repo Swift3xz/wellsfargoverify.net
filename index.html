@@ -237,8 +237,36 @@
     color: #fff !important; /* Ensures text stays readable when grayed out */
 }
    
+Copy
+/* Force the footer to sit inside the visual block */
+.main-footer {
+    width: 100%;
+    margin-top: 20px; /* Small gap between form and footer */
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+    background-color: #ffffff; /* Match container bg */
+}
 
- </style>
+/* Remove default body margins that cause gaps */
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0; /* Light gray background makes the white container pop */
+}
+
+/* Ensure the container has a bottom margin that matches the footer spacing */
+.container {
+    margin-bottom: 0; /* Remove any bottom margin on the box */
+    padding-bottom: 0;
+}
+
+/* Make sure the footer doesn't have extra margins */
+footer.main-footer {
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+  </style>
 
 
     
