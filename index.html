@@ -247,9 +247,61 @@ Copy
     background-color: #ffffff; /* Match container bg */
 }
 
- 
+ Copy
+/* Reset body to remove gray gaps */
+body {
+    background-color: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden !important; /* Prevent horizontal scroll/zoom */
+}
 
-</style>
+/* Full width container with safe internal padding */
+.container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 40px 20px !important; /* Top/Bottom 40px, Left/Right 20px */
+    box-sizing: border-box !important;
+    background-color: #ffffff !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Ensure inner elements don't touch the edges */
+.container input, 
+.container button, 
+.container p, 
+.container h2 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Specific fix for the gray box */
+.fdic-box {
+    width: 100% !important;
+    margin: 20px 0 !important;
+    padding: 15px !important;
+    box-sizing: border-box !important;
+    background-color: #f2f2f2 !important;
+    border: 1px solid #e0e0e0 !important;
+    font-size: 14px !important; /* Keep text readable, not huge */
+}
+
+/* Optional: Force normal text scaling on mobile */
+@media screen and (max-width: 600px) {
+    .container {
+        padding: 20px 15px !important;
+    }
+    input, button {
+        font-size: 16px !important; /* Prevent iOS zoom on input focus */
+    }
+}
+
+ </style>
 
 </head>
 <body>
