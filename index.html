@@ -12,7 +12,27 @@
             background-color: #ffffff;
             color: #000000;
         }
-        .header {
+       body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* This hides the horizontal scrollbar */
+        }
+
+        .content {
+            width: 100%;
+            max-width: 480px; /* Matches the typical mobile width of Wells Fargo pages */
+            margin: 0 auto;
+            padding: 20px 15px;
+            box-sizing: border-box; /* Ensures padding doesn't increase total width */
+            background-color: #ffffff;
+        }
+
+        /* Ensure all inputs and buttons don't break the layout */
+        input, button, select, textarea {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+         .header {
             background-color: #d71e28;
             padding: 15px 0;
             text-align: center;
@@ -192,29 +212,6 @@
                 gap: 10px;
             }
         }
-    
-    body {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden; /* This hides the horizontal scrollbar */
-        }
-
-        .content {
-            width: 100%;
-            max-width: 480px; /* Matches the typical mobile width of Wells Fargo pages */
-            margin: 0 auto;
-            padding: 20px 15px;
-            box-sizing: border-box; /* Ensures padding doesn't increase total width */
-            background-color: #ffffff;
-        }
-
-        /* Ensure all inputs and buttons don't break the layout */
-        input, button, select, textarea {
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-    
-    
     
     </style>
     
